@@ -1,8 +1,10 @@
 package com.example.spring_data_jpa_demo.services;
 
+import com.example.spring_data_jpa_demo.annotations.AdminOnly;
 import com.example.spring_data_jpa_demo.entity.Applicant;
 import com.example.spring_data_jpa_demo.entity.Job;
 import com.example.spring_data_jpa_demo.entity.Resume;
+import com.example.spring_data_jpa_demo.exceptions.ApplicantNotFoundException;
 import com.example.spring_data_jpa_demo.repositories.*;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +49,9 @@ public class ApplicationService {
         return applicantList;
     }
 
+    @AdminOnly
     public Applicant saveApplicant(Applicant applicant) {
+        System.out.println("Saved Applicant");
         return applicantCrudRepository.save(applicant);
     }
 
@@ -86,5 +90,16 @@ public class ApplicationService {
         applicant.applyJob(job);
 
         return applicantJpaRepository.save(applicant);
+    }
+
+
+    public List<Applicant> findApplicantByName(String name){
+        List<Applicant> applicants = applicantJpaRepository.findApplicantByName(name);
+
+        if(applicants.isEmpty()){
+            throw new ApplicantNotFoundException("Applicant is/are not found");
+        }
+
+        return applicants;
     }
 }

@@ -48,8 +48,15 @@ public class ApplicationController {
     }
 
     @GetMapping("/status")
-    public List<Applicant> getApplicantsByStatus(@RequestParam String status) {
-        return applicationService.getApplicantByStatus(status);
+    public ResponseEntity<List<Applicant>> getApplicantsByStatus(@RequestParam String status) {
+        List<Applicant> applicants = applicationService.getApplicantByStatus(status);
+
+        // -->  should not do this in controller. Let global exception handler handle it
+        if(applicants.isEmpty()){
+            return ResponseEntity.notFound().build(); // 404
+        }
+
+        return ResponseEntity.ok(applicants);
     }
 
     @PostMapping("/{applicantId}/resume/save")
@@ -72,6 +79,13 @@ public class ApplicationController {
         return ResponseEntity
                 .ok(applicationService.applyJob(applicantId, jobId));
 
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Applicant>> getApplicantByName(@RequestParam String name) {
+
+        return ResponseEntity
+                .ok(applicationService.findApplicantByName(name));
     }
 
 
