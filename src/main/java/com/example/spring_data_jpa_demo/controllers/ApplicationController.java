@@ -7,6 +7,8 @@ import com.example.spring_data_jpa_demo.services.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,11 +37,20 @@ public class ApplicationController {
     }
 
     @PostMapping("/create")
+    @Transactional
     public ResponseEntity<Applicant> saveApplicant(@RequestBody Applicant applicant) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(applicationService.saveApplicant(applicant));
 
+    }
+
+    @DeleteMapping("/delete/{applicantId}")
+    public ResponseEntity<Void> deleteApplicant(@PathVariable Long applicantId) {
+        applicationService.deleteById(applicantId);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
     }
 
     @GetMapping("/page")

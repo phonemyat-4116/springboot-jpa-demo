@@ -1,0 +1,233 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ApplicationService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.example.spring_data_jpa_demo.services</a>
+</div>
+
+<h1>Coverage Summary for Class: ApplicationService (com.example.spring_data_jpa_demo.services)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ApplicationService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    72.7%
+  </span>
+  <span class="absValue">
+    (8/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (2/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    73.5%
+  </span>
+  <span class="absValue">
+    (25/34)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.example.spring_data_jpa_demo.services;
+&nbsp;
+&nbsp;import com.example.spring_data_jpa_demo.annotations.AdminOnly;
+&nbsp;import com.example.spring_data_jpa_demo.entity.Applicant;
+&nbsp;import com.example.spring_data_jpa_demo.entity.Job;
+&nbsp;import com.example.spring_data_jpa_demo.entity.Resume;
+&nbsp;import com.example.spring_data_jpa_demo.exceptions.ApplicantNotFoundException;
+&nbsp;import com.example.spring_data_jpa_demo.repositories.*;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.jspecify.annotations.Nullable;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.data.domain.PageRequest;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import org.springframework.transaction.annotation.Propagation;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Service
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;public class ApplicationService {
+&nbsp;
+&nbsp;    private ApplicantCrudRepository  applicantCrudRepository;
+&nbsp;    private ApplicantPaginationAndSortingRepository applicantPaginationAndSortingRepository;
+&nbsp;    private ApplicantJpaRepository applicantJpaRepository;
+&nbsp;    private ResumeJpaRepository resumeJpaRepository;
+&nbsp;    private JobJpaRepository jobJpaRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    public ApplicationService(
+&nbsp;            ApplicantCrudRepository applicantCrudRepository,
+&nbsp;            ApplicantPaginationAndSortingRepository applicantPaginationAndSortingRepository,
+&nbsp;            ApplicantJpaRepository applicantJpaRepository,
+&nbsp;            ResumeJpaRepository resumeJpaRepository,
+<b class="fc">&nbsp;            JobJpaRepository jobJpaRepository) {</b>
+<b class="fc">&nbsp;        this.applicantCrudRepository = applicantCrudRepository;</b>
+<b class="fc">&nbsp;        this.applicantPaginationAndSortingRepository = applicantPaginationAndSortingRepository;</b>
+<b class="fc">&nbsp;        this.applicantJpaRepository = applicantJpaRepository;</b>
+<b class="fc">&nbsp;        this.resumeJpaRepository = resumeJpaRepository;</b>
+<b class="fc">&nbsp;        this.jobJpaRepository = jobJpaRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    public List&lt;Applicant&gt; getAllApplicants() {
+&nbsp;        // CrudRepo will return Iterable
+<b class="nc">&nbsp;        Iterable&lt;Applicant&gt; allApplicants = applicantCrudRepository.findAll();</b>
+<b class="nc">&nbsp;        List&lt;Applicant&gt; applicantList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        allApplicants.forEach(applicantList::add);</b>
+&nbsp;
+<b class="nc">&nbsp;        return applicantList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional(propagation = Propagation.NESTED)
+&nbsp;    public Applicant saveApplicant(Applicant applicant) {
+<b class="fc">&nbsp;        log.info(&quot;Saving Applicant {}&quot;, applicant);</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;Saved Applicant&quot;);</b>
+<b class="fc">&nbsp;        return applicantCrudRepository.save(applicant);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void deleteById(Long applicantId) {
+<b class="fc">&nbsp;        if(!applicantJpaRepository.existsById(applicantId)) {</b>
+<b class="fc">&nbsp;            throw new ApplicantNotFoundException(&quot;Applicant not found with id: &quot; + applicantId);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        applicantJpaRepository.deleteById(applicantId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // pagination
+&nbsp;    public Iterable&lt;Applicant&gt; getApplicantWithPagination(int page, int size) {
+<b class="nc">&nbsp;        return applicantPaginationAndSortingRepository.findAll(PageRequest.of(page, size));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Applicant&gt; getApplicantByStatus(String status) {
+<b class="fc">&nbsp;        return applicantJpaRepository.findByStatusOrderByNameAsc(status);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional
+&nbsp;    public Resume saveResume(Long applicantId, Resume resume) {
+<b class="fc">&nbsp;        Applicant applicant = applicantJpaRepository.findById(applicantId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Applicant is not found&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        resume.setApplicant(applicant);</b>
+&nbsp;
+<b class="fc">&nbsp;        return resumeJpaRepository.save(resume);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    public Job saveJob(Job job) {
+<b class="fc">&nbsp;        return jobJpaRepository.save(job);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Transactional(propagation = Propagation.REQUIRED)
+&nbsp;    public Applicant applyJob(Long applicantId, Long jobId) {
+<b class="fc">&nbsp;        Applicant applicant = applicantJpaRepository.findById(applicantId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Applicant is not found&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        Job job = jobJpaRepository.findById(jobId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException(&quot;Job is not found&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        applicant.applyJob(job);</b>
+&nbsp;
+<b class="fc">&nbsp;        return applicantJpaRepository.save(applicant);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @AdminOnly
+&nbsp;    public List&lt;Applicant&gt; findApplicantByName(String name){
+<b class="nc">&nbsp;        List&lt;Applicant&gt; applicants = applicantJpaRepository.findApplicantByName(name);</b>
+&nbsp;
+<b class="nc">&nbsp;        if(applicants.isEmpty()){</b>
+<b class="nc">&nbsp;            throw new ApplicantNotFoundException(&quot;Applicant is/are not found&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return applicants;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-01-15 12:29</div>
+</div>
+</body>
+</html>

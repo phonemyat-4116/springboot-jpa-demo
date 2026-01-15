@@ -8,7 +8,12 @@ import java.util.Set;
 @Entity
 public class Applicant {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "applicant_seq")
+    @SequenceGenerator(
+            name = "applicant_seq",
+            sequenceName = "applicant_id_seq",
+            allocationSize = 1
+    )
     private Long id;
     private String name;
     private String email;
